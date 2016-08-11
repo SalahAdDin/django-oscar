@@ -1,6 +1,7 @@
 from django.contrib import admin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+from sorl.thumbnail.admin import AdminImageMixin
 
 from oscar.core.loading import get_model
 
@@ -65,10 +66,11 @@ class ProductAdmin(admin.ModelAdmin):
 class ProductAttributeAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'product_class', 'type')
     prepopulated_fields = {"code": ("name", )}
+    list_filter = ['name', 'product_class', 'type']
 
 
 class OptionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['name', 'code', 'type']
 
 
 class ProductAttributeValueAdmin(admin.ModelAdmin):
@@ -84,9 +86,19 @@ class AttributeOptionGroupAdmin(admin.ModelAdmin):
     inlines = [AttributeOptionInline, ]
 
 
+class ProductImageAdmin(AdminImageMixin, admin.ModelAdmin):
+    list_display = ['product', 'original', 'display_order', 'date_created']
+    list_filter = ['product', 'display_order']
+
+
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(Category)
     list_display = ('name', 'slug')
+
+
+class ProductCategoryAdmin(admin.ModelAdmin):
+    list_display = ['product', 'category']
+    list_filter = ['product', 'category']
 
 
 admin.site.register(ProductClass, ProductClassAdmin)
@@ -95,6 +107,7 @@ admin.site.register(ProductAttribute, ProductAttributeAdmin)
 admin.site.register(ProductAttributeValue, ProductAttributeValueAdmin)
 admin.site.register(AttributeOptionGroup, AttributeOptionGroupAdmin)
 admin.site.register(Option, OptionAdmin)
-admin.site.register(ProductImage)
+admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(ProductCategory)
+admin.site.register(ProductCategory, ProductCategoryAdmin)
+
